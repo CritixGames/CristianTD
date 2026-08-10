@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CristianTD</string>
+    <string name="title_activity_main">CristianTD</string>
+    <string name="package_name">com.CristianTD.yourapp</string>
+    <string name="custom_url_scheme">com.CristianTD.yourapp</string>
+</resources>
