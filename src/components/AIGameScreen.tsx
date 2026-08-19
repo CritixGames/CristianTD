@@ -20,6 +20,7 @@ export function AIGameScreen({ players, onReset }: AIGameScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const [spinDuration, setSpinDuration] = useState(4000);
   const [spinEasing, setSpinEasing] = useState('cubic-bezier(0.17,0.67,0.12,0.99)');
+  const [promptHistory, setPromptHistory] = useState<string[]>([]);
   const spinTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   const getWeightedRandomPlayer = (): number => {
@@ -46,7 +47,7 @@ export function AIGameScreen({ players, onReset }: AIGameScreenProps) {
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ type, playerName, players }),
+        body: JSON.stringify({ type, playerName, players, previousPrompts: promptHistory }),
       });
 
       if (!response.ok) {
@@ -59,6 +60,7 @@ export function AIGameScreen({ players, onReset }: AIGameScreenProps) {
       }
 
       setPrompt(data.prompt);
+      setPromptHistory(prev => [...prev, data.prompt]);
       setPhase('reveal');
     } catch (err) {
       setError('Could not generate a prompt. Try again!');

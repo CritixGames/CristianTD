@@ -193,7 +193,7 @@ export function SetupScreen({ onStart }: SetupScreenProps) {
                 max={12}
                 value={playerCount}
                 onChange={(e) => setPlayerCount(Number(e.target.value))}
-                className="flex-1 accent-red-500 h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer"
+                className="flex-1 accent-red-500 h-3 sm:h-4 bg-gray-800 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:sm:w-8 [&::-webkit-slider-thumb]:sm:h-8 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-red-500 [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(239,68,68,0.6)] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-red-300 [&::-moz-range-thumb]:w-7 [&::-moz-range-thumb]:h-7 [&::-moz-range-thumb]:sm:w-8 [&::-moz-range-thumb]:sm:h-8 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-red-500 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-red-300"
               />
               <span className="font-['Press_Start_2P'] text-2xl text-red-500 min-w-[3ch] text-center">
                 {playerCount}
