@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    text-shadow: 
+      0 0 4px #ff0000,
+      0 0 11px #ff0000,
+      0 0 19px #ff0000,
+      0 0 40px #ff0000,
+      0 0 80px #ff0000;
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.4), 0 0 12px rgba(255, 0, 0, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.5), 0 0 18px rgba(255, 0, 0, 0.3);
+  }
+}
+
+@keyframes spin-wheel {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(var(--spin-degrees)); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes bg-scroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 50px 50px; }
+}
+
+@keyframes throb {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes silhouette-drift-1 {
+  0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.04; }
+  25% { transform: translateY(-15px) translateX(5px) scale(1.02); opacity: 0.06; }
+  50% { transform: translateY(-8px) translateX(-3px) scale(1); opacity: 0.035; }
+  75% { transform: translateY(10px) translateX(4px) scale(0.98); opacity: 0.055; }
+}
+
+@keyframes silhouette-drift-2 {
+  0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.04; }
+  30% { transform: translateY(12px) translateX(-4px) scale(1.01); opacity: 0.055; }
+  60% { transform: translateY(-10px) translateX(3px) scale(0.99); opacity: 0.03; }
+  80% { transform: translateY(5px) translateX(-2px) scale(1.02); opacity: 0.05; }
+}
+
+@keyframes silhouette-drift-3 {
+  0%, 100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 0.025; }
+  40% { transform: translateX(-50%) translateY(-12px) scale(1.03); opacity: 0.045; }
+  70% { transform: translateX(-50%) translateY(8px) scale(0.97); opacity: 0.02; }
+}
+
+.neon-text {
+  animation: flicker 3s infinite alternate;
+}
+
+.neon-box {
+  animation: pulse-glow 2s infinite;
+}
+
+.spin-animation {
+  animation: spin-wheel 4s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+}
+
+.slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.throb {
+  animation: throb 1.5s ease-in-out infinite;
+}
+
+.silhouette-drift-1 {
+  animation: silhouette-drift-1 12s ease-in-out infinite;
+}
+
+.silhouette-drift-2 {
+  animation: silhouette-drift-2 15s ease-in-out infinite;
+}
+
+.silhouette-drift-3 {
+  animation: silhouette-drift-3 18s ease-in-out infinite;
+}
+
+.retro-grid {
+  background-image: 
+    linear-gradient(rgba(255, 0, 0, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.08) 1px, transparent 1px);
+  background-size: 30px 30px;
+  animation: bg-scroll 4s linear infinite;
+}
+
+.scanline::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 0, 0, 0.12);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 100;
+}
+
+body {
+  background-color: #0a0a0a;
+  overflow-x: hidden;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23ff0000' opacity='0.8'/%3E%3C/svg%3E") 8 8, auto;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cc0000;
+  border-radius: 4px;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ff0000, 0 0 10px #ff0000;
+}
