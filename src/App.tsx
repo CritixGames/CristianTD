@@ -19,7 +19,7 @@ function DisclaimerScreen({ onDone }: { onDone: () => void }) {
           <span className="text-2xl">&#9888;&#65039;</span>
         </div>
         <p className="font-['VT323'] text-2xl sm:text-3xl text-white leading-relaxed">
-          You should <span className="text-red-400 font-bold">NOT</span> pressure anyone into doing things that they do <span className="text-red-400 font-bold">NOT</span> want to do.
+          You should <span className="text-red-400 font-bold">NOT</span> pressure anyone into doing things they do <span className="text-red-400 font-bold">NOT</span> want to do.
         </p>
         <div className="mt-10 flex justify-center">
           <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
