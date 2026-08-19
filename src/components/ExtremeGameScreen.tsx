@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, RotateCcw, Info, X, ArrowLeftRight } from 'lucide-react';
+import { Flame, RotateCcw, Info, X, ArrowLeftRight } from 'lucide-react';
 import { extremeDares } from '@/data/prompts';
 
 interface ExtremeGameScreenProps {
@@ -7,12 +7,13 @@ interface ExtremeGameScreenProps {
   onReset: () => void;
 }
 
-type Phase = 'ready' | 'reveal';
+type Phase = 'pick' | 'reveal';
 
 export function ExtremeGameScreen({ players, onReset }: ExtremeGameScreenProps) {
-  const [phase, setPhase] = useState<Phase>('ready');
+  const [phase, setPhase] = useState<Phase>('pick');
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [prompt, setPrompt] = useState<string | null>(null);
+  const [hiddenOptions, setHiddenOptions] = useState<string[]>([]);
   const [usedDares, setUsedDares] = useState<Set<number>>(new Set());
   const [showInfo, setShowInfo] = useState(false);
   const [round, setRound] = useState(1);
@@ -20,32 +21,51 @@ export function ExtremeGameScreen({ players, onReset }: ExtremeGameScreenProps) 
   const currentPlayer = players[currentPlayerIndex];
   const partnerPlayer = players[currentPlayerIndex === 0 ? 1 : 0];
 
-  const getRandomDare = (): string => {
-    if (usedDares.size >= extremeDares.length) {
+  const getUniqueDares = (count: number): string[] => {
+    const results: string[] = [];
+    const pickedIndices: number[] = [];
+
+    if (usedDares.size >= extremeDares.length - count) {
       setUsedDares(new Set());
       usedDares.clear();
     }
 
-    let index: number;
-    do {
-      index = Math.floor(Math.random() * extremeDares.length);
-    } while (usedDares.has(index));
+    for (let c = 0; c < count; c++) {
+      let index: number;
+      do {
+        index = Math.floor(Math.random() * extremeDares.length);
+      } while (usedDares.has(index) || pickedIndices.includes(index));
+      pickedIndices.push(index);
+      results.push(extremeDares[index]);
+    }
 
-    setUsedDares(prev => new Set([...prev, index]));
-    return extremeDares[index];
+    pickedIndices.forEach(idx => {
+      setUsedDares(prev => new Set([...prev, idx]));
+    });
+
+    return results;
   };
 
-  const pullDare = () => {
-    setPrompt(getRandomDare());
+  const generateOptions = () => {
+    setHiddenOptions(getUniqueDares(2));
+  };
+
+  const pickOption = (index: number) => {
+    setPrompt(hiddenOptions[index]);
     setPhase('reveal');
   };
 
   const nextRound = () => {
     setCurrentPlayerIndex(prev => (prev === 0 ? 1 : 0));
     setPrompt(null);
-    setPhase('ready');
+    setHiddenOptions([]);
+    setPhase('pick');
     setRound(prev => prev + 1);
   };
+
+  if (phase === 'pick' && hiddenOptions.length === 0) {
+    generateOptions();
+  }
 
   return (
     <div className="min-h-screen retro-grid scanline flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden">
@@ -61,8 +81,8 @@ export function ExtremeGameScreen({ players, onReset }: ExtremeGameScreenProps) 
             <h3 className="font-['Press_Start_2P'] text-sm text-orange-500 mb-6">1v1 EXTREME</h3>
             <div className="font-['VT323'] text-xl text-white leading-relaxed space-y-4">
               <p>No truths. No mercy. Dares only.</p>
-              <p>These are not for the faint of heart. Every round is a dare -- wild, intense, and unapologetic.</p>
-              <p>You pull it, you do it. No backing out.</p>
+              <p>Pick between 2 hidden dares each round -- you won't know what it says until you commit.</p>
+              <p>You pick it, you do it. No backing out.</p>
               <p className="text-orange-400 mt-4">You've been warned.</p>
             </div>
           </div>
@@ -89,7 +109,7 @@ export function ExtremeGameScreen({ players, onReset }: ExtremeGameScreenProps) 
       <h1 className="font-['Press_Start_2P'] text-xs sm:text-sm md:text-base text-orange-500 mb-4 text-center px-2">
         1v1 Extreme
       </h1>
-      <p className="font-['VT323'] text-lg text-orange-400/50 mb-6">DARES ONLY</p>
+      <p className="font-['VT323'] text-lg text-orange-400/50 mb-6">DARES ONLY <span className="text-xl">🌶️</span></p>
 
       {/* Player display */}
       <div className="flex items-center gap-3 sm:gap-5 mb-8 md:mb-10">
@@ -105,7 +125,7 @@ export function ExtremeGameScreen({ players, onReset }: ExtremeGameScreenProps) 
         </div>
 
         <div className="flex flex-col items-center">
-          <Zap size={20} className="text-orange-500 mb-1" fill="currentColor" />
+          <span className="text-xl mb-1">🌶️</span>
           <ArrowLeftRight size={16} className="text-orange-500/50" />
         </div>
 
@@ -126,21 +146,30 @@ export function ExtremeGameScreen({ players, onReset }: ExtremeGameScreenProps) 
 
       {/* Game area */}
       <div className="w-full max-w-md">
-        {phase === 'ready' && (
+        {phase === 'pick' && hiddenOptions.length > 0 && (
           <div className="slide-up text-center">
             <p className="font-['Press_Start_2P'] text-sm sm:text-base text-white mb-2">
               {currentPlayer}'s turn
             </p>
-            <p className="font-['VT323'] text-xl text-orange-300/60 mb-8">
-              {partnerPlayer} is watching...
+            <p className="font-['VT323'] text-xl text-orange-300/60 mb-5">
+              {partnerPlayer} is watching... pick your poison:
             </p>
-            <button
-              onClick={pullDare}
-              className="px-8 py-5 bg-gradient-to-r from-orange-700 to-red-900 text-white font-['VT323'] text-2xl sm:text-3xl rounded-lg hover:from-orange-600 hover:to-red-800 transition-all duration-300 shadow-[0_0_20px_rgba(255,165,0,0.3)] throb flex items-center justify-center gap-3 mx-auto"
-            >
-              <span className="text-2xl">🌶️</span>
-              PULL A DARE
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={() => pickOption(0)}
+                className="flex-1 py-6 rounded-lg border bg-gradient-to-b from-orange-900/60 to-black/80 border-orange-500/50 hover:border-orange-300 hover:bg-orange-900/40 text-white font-['VT323'] text-2xl transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <Flame size={20} className="text-orange-400" />
+                DARE 1
+              </button>
+              <button
+                onClick={() => pickOption(1)}
+                className="flex-1 py-6 rounded-lg border bg-gradient-to-b from-orange-900/60 to-black/80 border-orange-500/50 hover:border-orange-300 hover:bg-orange-900/40 text-white font-['VT323'] text-2xl transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <Flame size={20} className="text-orange-400" />
+                DARE 2
+              </button>
+            </div>
           </div>
         )}
 

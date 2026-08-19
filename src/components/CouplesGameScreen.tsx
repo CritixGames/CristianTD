@@ -7,13 +7,15 @@ interface CouplesGameScreenProps {
   onReset: () => void;
 }
 
-type Phase = 'pick' | 'choose' | 'reveal';
+type Phase = 'pick' | 'reveal';
 
 export function CouplesGameScreen({ players, onReset }: CouplesGameScreenProps) {
   const [phase, setPhase] = useState<Phase>('pick');
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [prompt, setPrompt] = useState<string | null>(null);
   const [promptType, setPromptType] = useState<'truth' | 'dare' | null>(null);
+  const [hiddenTruths, setHiddenTruths] = useState<string[]>([]);
+  const [hiddenDares, setHiddenDares] = useState<string[]>([]);
   const [usedTruths, setUsedTruths] = useState<Set<number>>(new Set());
   const [usedDares, setUsedDares] = useState<Set<number>>(new Set());
   const [showInfo, setShowInfo] = useState(false);
@@ -22,30 +24,44 @@ export function CouplesGameScreen({ players, onReset }: CouplesGameScreenProps) 
   const currentPlayer = players[currentPlayerIndex];
   const partnerPlayer = players[currentPlayerIndex === 0 ? 1 : 0];
 
-  const getRandomPrompt = (type: 'truth' | 'dare'): string => {
+  const getUniquePrompts = (type: 'truth' | 'dare', count: number): string[] => {
     const pool = type === 'truth' ? couplesTruths : couplesDares;
     const used = type === 'truth' ? usedTruths : usedDares;
+    const results: string[] = [];
+    const pickedIndices: number[] = [];
 
-    if (used.size >= pool.length) {
+    if (used.size >= pool.length - count) {
       if (type === 'truth') setUsedTruths(new Set());
       else setUsedDares(new Set());
       used.clear();
     }
 
-    let index: number;
-    do {
-      index = Math.floor(Math.random() * pool.length);
-    } while (used.has(index));
+    for (let c = 0; c < count; c++) {
+      let index: number;
+      do {
+        index = Math.floor(Math.random() * pool.length);
+      } while (used.has(index) || pickedIndices.includes(index));
+      pickedIndices.push(index);
+      results.push(pool[index]);
+    }
 
-    if (type === 'truth') setUsedTruths(prev => new Set([...prev, index]));
-    else setUsedDares(prev => new Set([...prev, index]));
+    pickedIndices.forEach(idx => {
+      if (type === 'truth') setUsedTruths(prev => new Set([...prev, idx]));
+      else setUsedDares(prev => new Set([...prev, idx]));
+    });
 
-    return pool[index];
+    return results;
   };
 
-  const chooseType = (type: 'truth' | 'dare') => {
+  const generateOptions = () => {
+    setHiddenTruths(getUniquePrompts('truth', 2));
+    setHiddenDares(getUniquePrompts('dare', 2));
+  };
+
+  const pickOption = (type: 'truth' | 'dare', index: number) => {
+    const text = type === 'truth' ? hiddenTruths[index] : hiddenDares[index];
     setPromptType(type);
-    setPrompt(getRandomPrompt(type));
+    setPrompt(text);
     setPhase('reveal');
   };
 
@@ -53,9 +69,15 @@ export function CouplesGameScreen({ players, onReset }: CouplesGameScreenProps) 
     setCurrentPlayerIndex(prev => (prev === 0 ? 1 : 0));
     setPrompt(null);
     setPromptType(null);
+    setHiddenTruths([]);
+    setHiddenDares([]);
     setPhase('pick');
     setRound(prev => prev + 1);
   };
+
+  if (phase === 'pick' && hiddenTruths.length === 0) {
+    generateOptions();
+  }
 
   return (
     <div className="min-h-screen retro-grid scanline flex flex-col items-center justify-center px-4 py-16 relative overflow-hidden">
@@ -70,8 +92,8 @@ export function CouplesGameScreen({ players, onReset }: CouplesGameScreenProps) 
             </button>
             <h3 className="font-['Press_Start_2P'] text-sm text-red-500 mb-6 neon-text">1v1 MODE</h3>
             <div className="font-['VT323'] text-xl text-white leading-relaxed space-y-4">
-              <p>Take turns choosing truth or dare.</p>
-              <p>These prompts are designed for two -- intimate, spicy, and meant to bring you closer.</p>
+              <p>Take turns picking from 4 hidden options.</p>
+              <p>2 truths and 2 dares -- you won't know what it says until you commit.</p>
               <p>No wheel needed. Just you two.</p>
               <p className="text-red-400 mt-4">Have fun together.</p>
             </div>
@@ -130,34 +152,46 @@ export function CouplesGameScreen({ players, onReset }: CouplesGameScreenProps) 
         </div>
       </div>
 
-      {/* Round indicator */}
       <p className="font-['VT323'] text-lg text-red-500/40 mb-6">Round {round}</p>
 
       {/* Game area */}
       <div className="w-full max-w-md">
-        {phase === 'pick' && (
+        {phase === 'pick' && hiddenTruths.length > 0 && (
           <div className="slide-up text-center">
             <p className="font-['Press_Start_2P'] text-sm sm:text-base text-white mb-2 neon-text">
               {currentPlayer}'s turn
             </p>
-            <p className="font-['VT323'] text-xl text-red-300/60 mb-8">
-              directed at {partnerPlayer}
+            <p className="font-['VT323'] text-xl text-red-300/60 mb-5">
+              directed at {partnerPlayer} -- pick one:
             </p>
-            <p className="font-['VT323'] text-2xl text-red-200 mb-5">Truth or Dare?</p>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() => chooseType('truth')}
-                className="flex-1 py-5 bg-gradient-to-b from-red-900/80 to-red-950/80 border border-red-400/50 text-white font-['VT323'] text-2xl rounded-lg hover:border-red-300 hover:bg-red-900/60 transition-all duration-300 flex items-center justify-center gap-2"
+                onClick={() => pickOption('truth', 0)}
+                className="py-4 bg-gradient-to-b from-red-900/80 to-red-950/80 border border-red-400/50 text-white font-['VT323'] text-xl sm:text-2xl rounded-lg hover:border-red-300 hover:bg-red-900/60 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                <Heart size={20} className="text-red-400" />
-                TRUTH
+                <Heart size={18} className="text-red-400" />
+                TRUTH 1
               </button>
               <button
-                onClick={() => chooseType('dare')}
-                className="flex-1 py-5 bg-gradient-to-b from-red-800/80 to-black/80 border border-red-600/50 text-white font-['VT323'] text-2xl rounded-lg hover:border-red-400 hover:bg-red-800/60 transition-all duration-300 flex items-center justify-center gap-2"
+                onClick={() => pickOption('dare', 0)}
+                className="py-4 bg-gradient-to-b from-red-800/80 to-black/80 border border-red-600/50 text-white font-['VT323'] text-xl sm:text-2xl rounded-lg hover:border-red-400 hover:bg-red-800/60 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                <Flame size={20} className="text-orange-400" />
-                DARE
+                <Flame size={18} className="text-orange-400" />
+                DARE 1
+              </button>
+              <button
+                onClick={() => pickOption('truth', 1)}
+                className="py-4 bg-gradient-to-b from-red-900/80 to-red-950/80 border border-red-400/50 text-white font-['VT323'] text-xl sm:text-2xl rounded-lg hover:border-red-300 hover:bg-red-900/60 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <Heart size={18} className="text-red-400" />
+                TRUTH 2
+              </button>
+              <button
+                onClick={() => pickOption('dare', 1)}
+                className="py-4 bg-gradient-to-b from-red-800/80 to-black/80 border border-red-600/50 text-white font-['VT323'] text-xl sm:text-2xl rounded-lg hover:border-red-400 hover:bg-red-800/60 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <Flame size={18} className="text-orange-400" />
+                DARE 2
               </button>
             </div>
           </div>
