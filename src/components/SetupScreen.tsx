@@ -263,7 +263,7 @@ export function SetupScreen({ onStart }: SetupScreenProps) {
                   placeholder={mode === 'couples' || mode === 'extreme' ? (i === 0 ? 'Player 1...' : 'Player 2...') : `Player ${i + 1}...`}
                   value={name}
                   onChange={(e) => handleNameChange(i, e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-900/80 border border-red-500/30 rounded-lg text-white font-['VT323'] text-xl placeholder:text-red-500/30 transition-all duration-300"
+                  className="w-full px-4 py-3 bg-gray-900/80 border border-red-500/30 rounded-lg text-white font-['VT323'] text-xl placeholder:text-red-500/30 focus:border-red-500/70 focus:bg-gray-900 focus:shadow-[0_0_12px_rgba(239,68,68,0.15)] transition-all duration-300 outline-none"
                   maxLength={20}
                 />
               ))}
