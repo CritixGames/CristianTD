@@ -27,7 +27,7 @@ export function GameScreen({ players, onReset }: GameScreenProps) {
   const spinTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   const getWeightedRandomPlayer = (): number => {
-    const weights = players.map((_, i) => (i === lastPlayerIndex ? 0.1 : 1));
+    const weights = players.map((_, i) => (i === lastPlayerIndex ? 0.3 : 1));
     const totalWeight = weights.reduce((sum, w) => sum + w, 0);
     let random = Math.random() * totalWeight;
     for (let i = 0; i < weights.length; i++) {
