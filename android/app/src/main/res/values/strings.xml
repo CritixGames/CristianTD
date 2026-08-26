@@ -4,4 +4,6 @@
     <string name="title_activity_main">CristianTD</string>
     <string name="package_name">com.CristianTD.yourapp</string>
     <string name="custom_url_scheme">com.CristianTD.yourapp</string>
+
+    <string name="admob_app_id">ca-app-pub-8538180988804244~9204593732</string>
 </resources>
