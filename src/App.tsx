@@ -1,9 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+
+/*
 import {
     AdMob,
     BannerAdSize,
     BannerAdPosition,
 } from '@capacitor-community/admob';
+*/
 
 import { SetupScreen, type GameMode } from '@/components/SetupScreen';
 import { GameScreen } from '@/components/GameScreen';
@@ -46,6 +49,11 @@ function App() {
     const [players, setPlayers] = useState<string[] | null>(null);
     const [mode, setMode] = useState<GameMode>('party');
 
+    /*
+    // ============================
+    // ADMOB - TEMPORARILY DISABLED
+    // ============================
+
     // Keeps track of whether the banner has already been created.
     const bannerCreated = useRef(false);
 
@@ -81,11 +89,17 @@ function App() {
 
         manageBanner();
     }, [players]);
+    */
 
     const handleStart = async (
         playerNames: string[],
         selectedMode: GameMode
     ) => {
+        /*
+        // ============================
+        // ADMOB INTERSTITIAL - DISABLED
+        // ============================
+
         // Show Google test interstitial before entering a game.
         if ((window as any).Capacitor) {
             try {
@@ -98,6 +112,7 @@ function App() {
                 console.error('Interstitial ad failed:', error);
             }
         }
+        */
 
         // Start the selected game.
         setPlayers(playerNames);
