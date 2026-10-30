@@ -1,8 +1,9 @@
+
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.CristianTD.yourapp',
-  appName: 'CristianTD',
+  appId: 'com.dirtytord.dirtytruthordare',
+  appName: 'Dirty Truth or Dare Game',
   webDir: 'dist'
 };
 

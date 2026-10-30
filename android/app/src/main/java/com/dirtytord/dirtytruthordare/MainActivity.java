@@ -1,4 +1,4 @@
-package com.CristianTD.yourapp;
+package com.dirtytord.dirtytruthordare;
 
 import com.getcapacitor.BridgeActivity;
 
